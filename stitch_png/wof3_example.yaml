@@ -1,28 +1,29 @@
-# Test configuration file for stitch.py
+# Configuration "document" in YAML for stitch.py
 
-nrows: 2
+---
+DEFAULT
+  nrows: 1
 
-ncols: 2
+  ncols: 3
 
-frames: 
- -
-    - ['/Users/Louis.Wicker/20200302_NSH','uh_2to5_90']
-    - ['/Users/Louis.Wicker/20200302_NSH_VRnew_MASK','uh_2to5_90']
- -
-    - ['/Users/Louis.Wicker/20200302_NSH','uh_2to5_prob_9km']
-    - ['/Users/Louis.Wicker/20200302_NSH_VRnew_MASK','uh_2to5_prob_9km']
-         
-ftimes: [5,180,5]  # start, end, interval in minutes
+  frames:
+   -
+      - ['/www/wof.nssl.noaa.gov/newse_images/20180510','w_up_90']
+      - ['/www/wof.nssl.noaa.gov/newse_research/20180510_1.5KM_dualresDA','w_up_90']
+      - ['/www/wof.nssl.noaa.gov/newse_research/20180510_1.5KM_dualresDA_NEST','w_up_90']
 
-fhours: ['2300']
+  ftimes: [5,180,5]  # start, end, interval in minutes
 
-output_movie:
-  - dir:    "./"
-  - label:  "Nashville_Comparison"
+  fhours: ['2300']
 
-# Dont change these unless you kinda know what they are about
+  output_movie:
+    - dir:    "./"
+    - label:  "May10_Updrafts"
 
-rcParams:
-  - 'animation.html':        'jshtml'
-  - 'animation.embed_limit': 4000                                    
-  - 'animation.ffmpeg_path': "/home/louis.wicker/miniconda3/bin/ffmpeg"
+  # Dont change these unless you kinda know what they are about
+
+  rcParams:
+    - 'animation.html':        'jshtml'
+    - 'animation.embed_limit': 4000
+    - 'animation.ffmpeg_path': "/home/louis.wicker/miniconda3/bin/ffmpeg"
+...
