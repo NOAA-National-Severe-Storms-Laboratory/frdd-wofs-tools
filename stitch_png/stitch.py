@@ -138,7 +138,7 @@ if __name__ == "__main__":
         print("\n ==> STITCH ERROR:  no input configuration filename!  EXITING!!!")
         sys.exit(-1)
     else:
-        with open(option.file) as file:
+        with open(options.file) as file:
             all_params = yaml.load(file, Loader=yaml.FullLoader)
 
 # Its a small list, so copy out the input parameters from the YAML file
