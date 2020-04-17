@@ -125,8 +125,11 @@ if __name__ == "__main__":
 
     parser = OptionParser()
 
-    parser.add_option("-f", "--file", dest="file",    type="string", default="stitch.yaml",  \
+    parser.add_option("-f", "--file", dest="file",    type="string", default="None",  \
                                     help = "Input config file to parse")
+
+    parser.add_option(      "--doc", dest="doc",      type="string", default="DEFAULT",  \
+                                    help = "Specific plot configuration to use in YAML multi-document config file")
 
     (options, args) = parser.parse_args()
     
@@ -135,10 +138,16 @@ if __name__ == "__main__":
         print("\n ==> STITCH ERROR:  no input configuration filename!  EXITING!!!")
         sys.exit(-1)
     else:
-        with open(r'stitch.yaml') as file:
-            input_params = yaml.load(file, Loader=yaml.FullLoader)
- 
+        with open(option.file) as file:
+            all_params = yaml.load(file, Loader=yaml.FullLoader)
+
 # Its a small list, so copy out the input parameters from the YAML file
+
+    try:
+        input_params = all_params[options.doc] 
+    except:
+        print("Error, document name %s not found" % options.doc)
+        sys.exit(1)
 
     nrows    = input_params['nrows']
     ncols    = input_params['ncols']
