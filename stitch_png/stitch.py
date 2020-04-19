@@ -44,7 +44,10 @@ def read_wofs_png(rundir, fhour, plottype, time, www_dir = None):
     
 # Read Image 
 
-    img = mpimg.imread(image_path)
+    try:
+        img = mpimg.imread(image_path)
+    except:
+        print("\n ==> STITCH ERROR:  cannot read image file: %s  EXITING!!! \n" % (image_path))
     
     if _reduce_image:
         
@@ -86,10 +89,13 @@ def plot_animation(fig, fhour, times, frames):
             ax_artists = []
 
             for t in times: 
-                image = read_wofs_png(fitem[0], fhour, fitem[1], t)
-                img = ax.imshow(image, animated=True)
-                txt = ax.set_title('%s     %s' %(os.path.split(fitem[0])[-1], fitem[1].upper()))
-                ax_artists.append([txt,img])
+                try:
+                    image = read_wofs_png(fitem[0], fhour, fitem[1], t)
+                    img = ax.imshow(image, animated=True)
+                    txt = ax.set_title('%s   %s  f%3.3i min' %(os.path.split(fitem[0])[-1], fitem[1].upper(), t))
+                    ax_artists.append([txt,img])
+                except:
+                    continue
 
             # Append each temporal sequence of frames for one subplot regions over time into artists[]
 
@@ -131,61 +137,73 @@ if __name__ == "__main__":
     parser.add_option(      "--doc", dest="doc",      type="string", default="DEFAULT",  \
                                     help = "Specific plot configuration to use in YAML multi-document config file")
 
+    parser.add_option(      "--all", dest="all",  default=False, action="store_true", \
+                                 help = "Boolean flag process all the documents in a file")
+
     (options, args) = parser.parse_args()
     
     if options.file == None:
         parser.print_help()
         print("\n ==> STITCH ERROR:  no input configuration filename!  EXITING!!!")
-        sys.exit(-1)
+        sys.exit()
     else:
         with open(options.file) as file:
             all_params = yaml.load(file, Loader=yaml.FullLoader)
 
-# Its a small list, so copy out the input parameters from the YAML file
 
-    try:
-        input_params = all_params[options.doc] 
-    except:
-        print("Error, document name %s not found" % options.doc)
-        sys.exit(1)
+    # local function to create individual movies from multi-doc (plot) YAML files
 
-    nrows    = input_params['nrows']
-    ncols    = input_params['ncols']
-    ftimes   = input_params['ftimes']
-    fhours   = input_params['fhours']
-    frames   = input_params['frames']
-    out_dir  = input_params['output_movie'][0]['dir']
-    out_name = input_params['output_movie'][1]['label']
+    def create_movie(input_params):
 
-# These are needed for animation plots
+        nrows    = input_params['nrows']
+        ncols    = input_params['ncols']
+        ftimes   = input_params['ftimes']
+        fhours   = input_params['fhours']
+        frames   = input_params['frames']
+        out_dir  = input_params['output_movie'][0]['dir']
+        out_name = input_params['output_movie'][1]['label']
 
-    plt.rcParams['animation.html']        = input_params['rcParams'][0]['animation.html']  
-    plt.rcParams['animation.embed_limit'] = input_params['rcParams'][1]['animation.embed_limit']  
-    plt.rcParams['animation.ffmpeg_path'] = input_params['rcParams'][2]['animation.ffmpeg_path']  
+        # These are needed for animation plots
+
+        plt.rcParams['animation.html']        = input_params['rcParams'][0]['animation.html']  
+        plt.rcParams['animation.embed_limit'] = input_params['rcParams'][1]['animation.embed_limit']  
+        plt.rcParams['animation.ffmpeg_path'] = input_params['rcParams'][2]['animation.ffmpeg_path']  
     
-    print("ffmpeg:  ", plt.rcParams['animation.ffmpeg_path'])  
+        print("ffmpeg:  ", plt.rcParams['animation.ffmpeg_path'])  
 
-    times  = ftimes[0] + ftimes[2]*(np.arange(1 + (ftimes[1]-ftimes[0])/ftimes[2]))
+        times  = ftimes[0] + ftimes[2]*(np.arange(1 + (ftimes[1]-ftimes[0])/ftimes[2]))
 
-    for hour in fhours:
+        for hour in fhours:
              
-        fname_movie = ('%s/%s_F%s_Comparison.mp4' % (out_dir, out_name, hour[0:2]))
-        print("Making:  %s" % fname_movie)
+            fname_movie = ('%s/%s_%sUTC_Comparison.mp4' % (out_dir, out_name, hour[0:2]))
+            print("Making:  %s" % fname_movie)
 
-        fig    = plt.figure(figsize=(8*ncols, 9*nrows))
+            fig    = plt.figure(figsize=(8.5*ncols, 9*nrows))
 
-        with timeit():
-            movie = plot_animation(fig, hour, times, frames)
+            with timeit():
+                movie = plot_animation(fig, hour, times, frames)
 
+            with timeit():
+                my_anim = manimation.ArtistAnimation(fig, movie, interval=100, blit=True)
 
-        with timeit():
-            my_anim = manimation.ArtistAnimation(fig, movie, interval=100, blit=True)
+            with timeit():
+                WriterClass = manimation.writers['ffmpeg']
+                writer = WriterClass(fps=10, bitrate=1800)
+                my_anim.save(fname_movie, writer=writer, dpi=72)
 
-        with timeit():
-            WriterClass = manimation.writers['ffmpeg']
-            writer = WriterClass(fps=10, bitrate=1800)
-            my_anim.save(fname_movie, writer=writer, dpi=72)
+    # end create_movie function
 
-#         Animate the images
-#         if True:
-#             my_anim
+    # if "--all" is False, just create a single set of movies for the forecast hours submitted. 
+
+    if options.all == False:
+
+        create_movie(all_params[options.doc])
+
+    else:
+
+    # if "--all" is True, create multiple movies for the forecast hours submitted. 
+    # "key" is the header for the YAML document section ("W_MAX_90", "UH_2to5_90", etc).
+
+        for key in all_params.keys():
+
+            create_movie(all_params[key])

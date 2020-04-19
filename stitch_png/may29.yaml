@@ -1,0 +1,80 @@
+# Configuration "document" in YAML for stitch.py
+
+#---------- DEFAULT -------
+W_UP_90:
+  nrows: 1
+
+  ncols: 3
+
+  frames:
+   -
+      - ['/www/wof.nssl.noaa.gov/newse_images/20180529','w_up_90']
+      - ['/www/wof.nssl.noaa.gov/newse_research/20180529_1.5KM_dualresDA','w_up_90']
+      - ['/www/wof.nssl.noaa.gov/newse_research/20180529_1.5KM_dualresDA_NEST','w_up_90']
+
+  ftimes: [5,170,5]  # start, end, interval in minutes
+
+  fhours: ['2100', '2300']
+
+  output_movie:
+    - dir:    "./"
+    - label:  "../May29_W_MAX_90"
+
+  # Dont change these unless you kinda know what they are about
+
+  rcParams:
+    - 'animation.html':        'jshtml'
+    - 'animation.embed_limit': 4000
+    - 'animation.ffmpeg_path': "/home/louis.wicker/miniconda3/bin/ffmpeg"
+#---------------------
+UH_2to5_90:
+  nrows: 1
+
+  ncols: 3
+
+  frames:
+   -
+      - ['/www/wof.nssl.noaa.gov/newse_images/20180529','uh_2to5_90']
+      - ['/www/wof.nssl.noaa.gov/newse_research/20180529_1.5KM_dualresDA','uh_2to5_90']
+      - ['/www/wof.nssl.noaa.gov/newse_research/20180529_1.5KM_dualresDA_NEST','uh_2to5_90']
+
+  ftimes: [5,170,5]  # start, end, interval in minutes
+
+  fhours: ['2100', '2300']
+
+  output_movie:
+    - dir:    "./"
+    - label:  "../May29_UH_2to5_90"
+
+  # Dont change these unless you kinda know what they are about
+
+  rcParams:
+    - 'animation.html':        'jshtml'
+    - 'animation.embed_limit': 4000
+    - 'animation.ffmpeg_path': "/home/louis.wicker/miniconda3/bin/ffmpeg"
+#---------------------
+MRMS_MID:
+  nrows: 1
+
+  ncols: 3
+
+  frames:
+   -
+      - ['/www/wof.nssl.noaa.gov/newse_images/20180529','mrms_mid']
+      - ['/www/wof.nssl.noaa.gov/newse_images/20180529','uh_2to5_90']
+      - ['/www/wof.nssl.noaa.gov/newse_research/20180529_1.5KM_dualresDA_NEST','uh_2to5_90']
+
+  ftimes: [5,170,5]  # start, end, interval in minutes
+
+  fhours: ['2100','2300']
+
+  output_movie:
+    - dir:    "./"
+    - label:  "../May29_MRMS_MID"
+
+  # Dont change these unless you kinda know what they are about
+
+  rcParams:
+    - 'animation.html':        'jshtml'
+    - 'animation.embed_limit': 4000
+    - 'animation.ffmpeg_path': "/home/louis.wicker/miniconda3/bin/ffmpeg"
